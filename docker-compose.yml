@@ -1,0 +1,9 @@
+version: '3'
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+    image: "postgres:13.3-alpine"
+    environment:
+      - POSTGRES_USER=memo
+      - POSTGRES_PASSWORD=memo
