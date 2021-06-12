@@ -1,5 +1,6 @@
 package com.pkulak.memo.storage
 
+import com.pkulak.memo.util.accountBytes
 import com.pkulak.memo.util.bytes
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.StdOutSqlLogger
@@ -11,8 +12,8 @@ class BlockStorage(private val db: Database) {
     fun insertBlock(block: String, account: String, link: String, memo: String) = transaction(db) {
         Block.new {
             this.block = block.bytes()
-            this.account = NanoAccount.parseAddress(account).toPublicKey().bytes()
-            this.link = NanoAccount.parseAddress(link).toPublicKey().bytes()
+            this.account = account.accountBytes()
+            this.link = link.accountBytes()
             this.memo = memo
         }
     }

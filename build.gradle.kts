@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.5.10"
+    kotlin("plugin.serialization") version "1.5.10"
 }
 
 group = "com.pkulak.memo"
@@ -21,6 +22,11 @@ dependencies {
 
     // Dependency Injection
     implementation("io.insert-koin:koin-core:$koinVersion")
+    implementation("io.insert-koin:koin-ktor:$koinVersion")
+
+    // HTTP
+    implementation("io.ktor:ktor-server-netty:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
 
     // Storage
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
@@ -31,11 +37,14 @@ dependencies {
     // Logging
     implementation("org.slf4j:slf4j-simple:1.7.30")
     implementation("io.github.microutils:kotlin-logging:2.0.8")
+    implementation("io.insert-koin:koin-logger-slf4j:$koinVersion")
 
     // Testing
     testImplementation(platform("org.junit:junit-bom:5.7.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("io.kotest:kotest-assertions-jvm:4.0.7")
+    testImplementation("io.insert-koin:koin-test-junit5:2.2.2")
+    testImplementation("io.ktor:ktor-server-test-host:1.6.0")
 }
 
 tasks.test {
