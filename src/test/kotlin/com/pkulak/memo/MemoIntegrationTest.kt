@@ -1,7 +1,7 @@
 package com.pkulak.memo
 
 import com.pkulak.memo.storage.Blocks
-import io.ktor.server.engine.*
+import io.ktor.server.engine.ApplicationEngine
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -26,3 +26,5 @@ fun ApplicationEngine.resetDb() {
 }
 
 inline fun <reified T: Any> ApplicationEngine.inject() = application.inject<T>()
+
+inline fun <reified T: Any> ApplicationEngine.get() = application.get<T>()

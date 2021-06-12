@@ -2,23 +2,40 @@ package com.pkulak.memo.api
 
 import com.pkulak.memo.ACCOUNT
 import com.pkulak.memo.BLOCK_ID
+import com.pkulak.memo.PRIVATE_KEY
+import com.pkulak.memo.get
 import com.pkulak.memo.init
 import com.pkulak.memo.initDb
+import com.pkulak.memo.resetDb
+import com.pkulak.memo.storage.BlockStorage
+import com.pkulak.memo.util.bytes
 import io.kotest.matchers.shouldBe
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.server.testing.*
+import io.ktor.application.Application
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.testing.handleRequest
+import io.ktor.server.testing.setBody
+import io.ktor.server.testing.withTestApplication
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import uk.oczadly.karl.jnano.util.CryptoUtil
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BlockTest {
     @BeforeAll
     fun setup() = withTestApplication(Application::init) {
         initDb()
+    }
+
+    @BeforeEach
+    fun reset() = withTestApplication(Application::init) {
+        resetDb()
     }
 
     @Test
@@ -50,5 +67,35 @@ class BlockTest {
         }
 
         resp.response.status()!!
+    }
+
+    @Test
+    fun blockRetrieval() = withTestApplication({ init(); block() }) {
+        get<BlockStorage>().insertBlock(BLOCK_ID, ACCOUNT, ACCOUNT, "A new bike... wow! \uD83D\uDEB4")
+
+        // we sign the full path for authorization
+        val path = "/blocks/$BLOCK_ID/memo?account=$ACCOUNT"
+        val signature = CryptoUtil.sign(path.toByteArray(), PRIVATE_KEY.bytes())
+
+        val resp = handleRequest(HttpMethod.Get, path) {
+            addHeader(HttpHeaders.Authorization, "Signature $signature")
+        }
+
+        resp.response.status() shouldBe HttpStatusCode.OK
+
+        runBlocking {
+            resp.response.content shouldBe "A new bike... wow! \uD83D\uDEB4"
+        }
+    }
+
+    @Test
+    fun blockRetrievalBadSig() = withTestApplication({ init(); block() }) {
+        get<BlockStorage>().insertBlock(BLOCK_ID, ACCOUNT, ACCOUNT, "A new bike... wow! \uD83D\uDEB4")
+
+        val resp = handleRequest(HttpMethod.Get, "/blocks/$BLOCK_ID/memo?account=$ACCOUNT") {
+            addHeader(HttpHeaders.Authorization, "Signature BD79CE85C8AF794FD567C5D5D9F6FBB59353DE1E2AF43E7DB11482")
+        }
+
+        resp.response.status() shouldBe HttpStatusCode.Unauthorized
     }
 }

@@ -3,10 +3,7 @@ package com.pkulak.memo.storage
 import com.pkulak.memo.util.accountBytes
 import com.pkulak.memo.util.bytes
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.StdOutSqlLogger
-import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
-import uk.oczadly.karl.jnano.model.NanoAccount
 
 class BlockStorage(private val db: Database) {
     fun insertBlock(block: String, account: String, link: String, memo: String) = transaction(db) {

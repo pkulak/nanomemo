@@ -1,6 +1,6 @@
 package com.pkulak.memo.storage
 
-import io.ktor.http.*
+import io.ktor.http.HttpStatusCode
 
 open class HttpException : Exception() {
     open val status = HttpStatusCode.InternalServerError

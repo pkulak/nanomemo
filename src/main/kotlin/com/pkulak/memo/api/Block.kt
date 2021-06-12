@@ -1,16 +1,23 @@
 package com.pkulak.memo.api
 
-import com.pkulak.memo.storage.*
 import com.pkulak.memo.storage.BadRequestException
+import com.pkulak.memo.storage.BlockStorage
+import com.pkulak.memo.storage.ForbiddenException
 import com.pkulak.memo.storage.NotFoundException
+import com.pkulak.memo.storage.UnauthorizedException
 import com.pkulak.memo.util.accountBytes
 import com.pkulak.memo.util.bytes
-import io.ktor.application.*
-import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.application.Application
+import io.ktor.application.call
+import io.ktor.features.origin
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.request.header
+import io.ktor.request.receive
+import io.ktor.response.respond
+import io.ktor.routing.get
+import io.ktor.routing.post
+import io.ktor.routing.routing
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -33,8 +40,12 @@ fun Application.block() {
             val body = call.receive<ByteArray>()
             val req = Json.decodeFromString<BlockRequest>(String(body))
 
-            if (!CryptoUtil.verifySig(body, sig.bytes(), req.account.accountBytes())) {
-                throw UnauthorizedException("invalid signature")
+            try {
+                if (!CryptoUtil.verifySig(body, sig.bytes(), req.account.accountBytes())) {
+                    throw UnauthorizedException("invalid signature")
+                }
+            } catch (e: IllegalArgumentException) {
+                throw UnauthorizedException(e.message ?: "invalid signature")
             }
 
             if (req.memo.length > 255) {
@@ -64,11 +75,14 @@ fun Application.block() {
 
             val body = call.request.origin.uri.toByteArray()
 
-            if (!CryptoUtil.verifySig(body, sig.bytes(), block.link)) {
-                throw UnauthorizedException("invalid signature")
+            try {
+                if (!CryptoUtil.verifySig(body, sig.bytes(), block.link)) {
+                    throw UnauthorizedException("invalid signature")
+                }
+            } catch (e: IllegalArgumentException) {
+                throw UnauthorizedException(e.message ?: "invalid signature")
             }
 
-            call.response.header(HttpHeaders.ContentType, "text/plain")
             call.respond(HttpStatusCode.OK, block.memo)
         }
     }
