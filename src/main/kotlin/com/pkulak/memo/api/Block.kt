@@ -53,6 +53,10 @@ fun Application.block() {
             }
 
             with (req) {
+                if (blockStorage.blockExists(block)) {
+                    throw BadRequestException("this block has already been created")
+                }
+
                 blockStorage.insertBlock(block, account, link, memo)
             }
 

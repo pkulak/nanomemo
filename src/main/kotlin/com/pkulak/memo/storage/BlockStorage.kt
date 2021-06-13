@@ -20,4 +20,10 @@ class BlockStorage(private val db: Database) {
             .find { Blocks.block eq block.bytes() }
             .firstOrNull()
     }
+
+    fun blockExists(block: String) = transaction(db) {
+        !Block
+            .find { Blocks.block eq block.bytes() }
+            .empty()
+    }
 }

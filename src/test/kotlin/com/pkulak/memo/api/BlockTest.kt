@@ -26,6 +26,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import uk.oczadly.karl.jnano.util.CryptoUtil
 
+val SIG = "DB6C2AC9EAED69DBA23B0790B97D8DDBB5D005570EF793373FFC5011CD328D8D7E4778BE3DE91603F430AD466C6FE92FD7F644CAB9" +
+        "12C64EBC2AD0946BFAEE0B"
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BlockTest {
     @BeforeAll
@@ -40,13 +43,17 @@ class BlockTest {
 
     @Test
     fun blockCreation() {
-        val goodSig = "DB6C2AC9EAED69DBA23B0790B97D8DDBB5D005570EF793373FFC5011CD328D8D7E4778BE3DE91603F430AD466C6FE9" +
-                "2FD7F644CAB912C64EBC2AD0946BFAEE0B"
         val badSig = "AB6C2AC9EAED69DBA23B0790B97D8DDBB5D005570EF793373FFC5011CD328D8D7E4778BE3DE91603F430AD466C6FE92" +
                 "FD7F644CAB912C64EBC2AD0946BFAEE0B"
 
-        createBlock(goodSig) shouldBe HttpStatusCode.OK
+        createBlock(SIG) shouldBe HttpStatusCode.OK
         createBlock(badSig) shouldBe HttpStatusCode.Unauthorized
+    }
+
+    @Test
+    fun duplicateBlockCreation() {
+        createBlock(SIG) shouldBe HttpStatusCode.OK
+        createBlock(SIG) shouldBe HttpStatusCode.BadRequest
     }
 
     private fun createBlock(signature: String): HttpStatusCode = withTestApplication({ init(); block() }) {
