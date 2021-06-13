@@ -12,15 +12,16 @@ almost nothing.
 Create a Memo
 --------
 
-You create a memo by passing most of the block to the API. This is so that you
+You create a memo by passing most of the block to the API. This is so you
 can create the memo concurrent with the block on the network (or even before
 you create the network block). Since the API is write-once, this guarantees that
 you own the memo for your block, as block IDs can't be known ahead of time.
 
-A request is authorized by signing the payload with your private key, using the
-exact signing method of Nano itself (ED25519 + Blake2b). This can be tricky to
-get right with command line tools, so for this example we are piping a file
-directly into Httpie, which we computed the signature for beforehand.
+A request is authorized by signing the payload with your private key (the public
+key being the `account` propery), using the exact signing method of Nano itself
+(ED25519 + Blake2b). This can be tricky to get right with command line tools, so
+for this example we are piping a file directly into Httpie, for which we computed
+the signature beforehand.
 
 **Body**
 
@@ -43,9 +44,9 @@ directly into Httpie, which we computed the signature for beforehand.
 Retrieve a Memo
 ---------------
 
-To get a memo, authorization is the same, but you sign the HTTP path. You also
-need to send the account you're expecting to have received from, as a
-verification.
+To get a memo, authorization is the same (in this case the public key is the `link`
+property), but you sign the HTTP path. You also need to send the account you're
+expecting to have received from, as a verification.
 
 **Request**
 
