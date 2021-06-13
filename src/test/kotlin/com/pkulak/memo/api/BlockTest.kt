@@ -1,8 +1,9 @@
 package com.pkulak.memo.api
 
 import com.pkulak.memo.ACCOUNT
+import com.pkulak.memo.ACCOUNT2
 import com.pkulak.memo.BLOCK_ID
-import com.pkulak.memo.PRIVATE_KEY
+import com.pkulak.memo.PRIVATE_KEY2
 import com.pkulak.memo.get
 import com.pkulak.memo.init
 import com.pkulak.memo.initDb
@@ -26,8 +27,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import uk.oczadly.karl.jnano.util.CryptoUtil
 
-val SIG = "DB6C2AC9EAED69DBA23B0790B97D8DDBB5D005570EF793373FFC5011CD328D8D7E4778BE3DE91603F430AD466C6FE92FD7F644CAB9" +
-        "12C64EBC2AD0946BFAEE0B"
+val SIG = "6F0E589A410AE044EBB2ED6942E667B29789BBBCBDCA20B85BD018B92AB5957447372A3EBB9F5C9D4ADA7E8E0E5EF13C739087E25C" +
+        "0BA2D2D61298E70991F403"
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BlockTest {
@@ -60,7 +61,7 @@ class BlockTest {
         val bodyObject = BlockRequest(
             block = BLOCK_ID,
             account = ACCOUNT,
-            link = ACCOUNT,
+            link = ACCOUNT2,
             memo = "Pizza! \uD83C\uDF55"
         )
 
@@ -78,11 +79,11 @@ class BlockTest {
 
     @Test
     fun blockRetrieval() = withTestApplication({ init(); block() }) {
-        get<BlockStorage>().insertBlock(BLOCK_ID, ACCOUNT, ACCOUNT, "A new bike... wow! \uD83D\uDEB4")
+        get<BlockStorage>().insertBlock(BLOCK_ID, ACCOUNT, ACCOUNT2, "A new bike... wow! \uD83D\uDEB4")
 
         // we sign the full path for authorization
         val path = "/blocks/$BLOCK_ID/memo?account=$ACCOUNT"
-        val signature = CryptoUtil.sign(path.toByteArray(), PRIVATE_KEY.bytes())
+        val signature = CryptoUtil.sign(path.toByteArray(), PRIVATE_KEY2.bytes())
 
         val resp = handleRequest(HttpMethod.Get, path) {
             addHeader(HttpHeaders.Authorization, "Signature $signature")
