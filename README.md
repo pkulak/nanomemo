@@ -1,5 +1,5 @@
-Nano Memo
-=========
+<img src="https://svgur.com/i/U0r.svg" height=28/> Nano Memo
+==========
 
 A super-simple, off-chain storage for [Nano](https://nano.org/) memo lines
 (and possibly other metadata in the future). There are existing APIs for this,
@@ -10,7 +10,7 @@ project, which took this project from a reasonable amount of work down to
 almost nothing.
 
 Create a Memo
---------
+----------
 
 You create a memo by passing most of the block to the API. This is so you
 can create the memo concurrent with the block on the network (or even before
@@ -42,7 +42,7 @@ the signature beforehand.
     HTTP/1.1 200 OK
 
 Retrieve a Memo
----------------
+----------
 
 To get a memo, authorization is the same (in this case the public key is the `link`
 property), but you sign the HTTP path. You also need to send the account you're
