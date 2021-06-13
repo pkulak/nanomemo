@@ -18,7 +18,7 @@ you create the network block). Since the API is write-once, this guarantees that
 you own the memo for your block, as block IDs can't be known ahead of time.
 
 A request is authorized by signing the payload with your private key (the public
-key being the `account` propery), using the exact signing method of Nano itself
+key being the `account` property), using the exact signing method of Nano itself
 (ED25519 + Blake2b). This can be tricky to get right with command line tools, so
 for this example we are piping a file directly into Httpie, for which we computed
 the signature beforehand.
