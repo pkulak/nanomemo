@@ -5,6 +5,9 @@ A super-simple, off-chain storage for [Nano](https://nano.org/) memo lines
 (and possibly other metadata in the future). There are existing APIs for this,
 but it's so simple, I figured I'd whip up an open-source solution.
 
+New memos are signed by the sender and verified by the api, and requests to
+get the memo are signed by the receiver and verified by the api.
+
 Huge shout out to the wonderful [JNano](https://github.com/koczadly/jNano)
 project, which took this project from a reasonable amount of work down to
 almost nothing.
@@ -15,7 +18,7 @@ Create a Memo
 You create a memo by passing most of the block to the API. This is so you
 can create the memo concurrent with the block on the network (or even before
 you create the network block). Since the API is write-once, this guarantees that
-you own the memo for your block, as block IDs can't be known ahead of time.
+you own the memo for your block, as block IDs can't be known ahead of time
 
 A request is authorized by signing the payload with your private key (the public
 key being the `account` property), using the exact signing method of Nano itself
