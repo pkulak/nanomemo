@@ -67,20 +67,20 @@ fun Application.block() {
             val sig = call.request.header(HttpHeaders.Authorization)?.substring(10) ?:
                 throw ForbiddenException("please include an Authorization header")
 
-            val account = call.request.queryParameters["account"] ?:
-                throw BadRequestException("please include an account query parameter")
+            val account = call.request.queryParameters["account"]
 
             val block = blockStorage.selectBlock(call.parameters["id"] ?: "") ?:
                 throw NotFoundException("block", call.parameters["id"])
 
-            if (!block.account.contentEquals(account.accountBytes())) {
+            if (account != null && !block.account.contentEquals(account.accountBytes())) {
                 throw BadRequestException("account submitted doesn't match account in the block")
             }
 
             val body = call.request.origin.uri.toByteArray()
+            val publicKey = if (account == null) block.account else block.link
 
             try {
-                if (!CryptoUtil.verifySig(body, sig.bytes(), block.link)) {
+                if (!CryptoUtil.verifySig(body, sig.bytes(), publicKey)) {
                     throw UnauthorizedException("invalid signature")
                 }
             } catch (e: IllegalArgumentException) {

@@ -3,6 +3,7 @@ package com.pkulak.memo.api
 import com.pkulak.memo.ACCOUNT
 import com.pkulak.memo.ACCOUNT2
 import com.pkulak.memo.BLOCK_ID
+import com.pkulak.memo.PRIVATE_KEY
 import com.pkulak.memo.PRIVATE_KEY2
 import com.pkulak.memo.get
 import com.pkulak.memo.init
@@ -98,12 +99,27 @@ class BlockTest {
 
     @Test
     fun blockRetrievalBadSig() = withTestApplication({ init(); block() }) {
-        get<BlockStorage>().insertBlock(BLOCK_ID, ACCOUNT, ACCOUNT, "A new bike... wow! \uD83D\uDEB4")
+        get<BlockStorage>().insertBlock(BLOCK_ID, ACCOUNT, ACCOUNT2, "A new bike... wow! \uD83D\uDEB4")
 
         val resp = handleRequest(HttpMethod.Get, "/blocks/$BLOCK_ID/memo?account=$ACCOUNT") {
             addHeader(HttpHeaders.Authorization, "Signature BD79CE85C8AF794FD567C5D5D9F6FBB59353DE1E2AF43E7DB11482")
         }
 
         resp.response.status() shouldBe HttpStatusCode.Unauthorized
+    }
+
+    @Test
+    fun blockRetrievalAsSender() = withTestApplication({ init(); block() }) {
+        get<BlockStorage>().insertBlock(BLOCK_ID, ACCOUNT, ACCOUNT2, "A new bike... wow! \uD83D\uDEB4")
+
+        // now we use the _sender_ private key
+        val path = "/blocks/$BLOCK_ID/memo"
+        val signature = CryptoUtil.sign(path.toByteArray(), PRIVATE_KEY.bytes())
+
+        val resp = handleRequest(HttpMethod.Get, path) {
+            addHeader(HttpHeaders.Authorization, "Signature $signature")
+        }
+
+        resp.response.status() shouldBe HttpStatusCode.OK
     }
 }

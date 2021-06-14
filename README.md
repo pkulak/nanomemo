@@ -65,6 +65,9 @@ expecting to have received from, as a verification.
 
     Thanks for the pizza!
 
+Note: you can retrieve your own memo by omitting the account query parameter
+and signing the path with your private key.
+
 <hr>
 <sup>
 Donations welcome!
